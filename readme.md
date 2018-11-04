@@ -8,7 +8,7 @@ Email: mrtang@nudt.edu.cn
 
 ##[BCIROS](http://weibo.com/ihubo),[GuiEngine](http://weibo.com/ihubo),[Phase](http://weibo.com/ihubo)
 
-h2GuiEngine是什么?
+h2 GuiEngine是什么?
 一个简洁的图形刺激引擎
 
 ##GuiEngine的特性
