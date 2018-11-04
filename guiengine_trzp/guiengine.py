@@ -51,8 +51,16 @@ class GuiEngine(threading.Thread):
         Q_c2g: multiprocessing.Queue, used for accepting stimulus control command from core process
         E_g2p: multiprocessing.Event, used for sending user termination event to the phase process
         Q_g2s: multiprocessing.Queue, used for sending accurate trigger to sigpro process
+        
+        property for describe screen
+        size: (width,height)
+        type: fullscreen/normal
+        frameless: True/False
+        color: (R,G,B)
+        caption: string
+        Fps: int, strongly suggest you set Fps as the same with system's Fps
         """
-        super(GUImachine,self).__init__()
+        super(GuiEngine,self).__init__()
         pygame.init()
         self.Q_c2g = Q_c2g
         self.E_g2p = E_g2p
@@ -81,7 +89,6 @@ class GuiEngine(threading.Thread):
         self.Fps = stims['screen']['Fps']
         del stims['screen']
 
-        self.setDaemon(True)                #子线程隧主线程退出
         self.ask_4_update_gui = False       #线程接收到刷新请求后，通知主进程刷新
         self.update_in_this_frame = False   #主进程在一帧真实的刷新帧中确定能够进行刷新
         self.__update_per_frame_list = []   #接受帧刷新对象
@@ -98,6 +105,9 @@ class GuiEngine(threading.Thread):
                 self.stimuli[ID] = mBlock(self.screen,**element['parm'])
                 self.__update_per_frame_list.append(self.stimuli[ID])
             else:   pass
+
+        self.setDaemon(True)                #子线程隧主线程退出
+        self.start()
 
     def run(self):  #接收刷新请求字典
         # arg = self.Q_c2g.get()
@@ -120,6 +130,7 @@ class GuiEngine(threading.Thread):
             self.lock.release()
 
     def StartRun(self):
+        print '>>>>>>> gui engine started >>>>>>>'
         clock = pygame.time.Clock()
         END = 0
         while True:
@@ -156,3 +167,5 @@ class GuiEngine(threading.Thread):
         pygame.quit()
         if END: self.E_g2p.set()  #通知phase进程，用户结束
         for ID in self.__release_ID_list:   del self.stimuli[ID]
+
+        print '>>>>>> gui engine exit >>>>>>'

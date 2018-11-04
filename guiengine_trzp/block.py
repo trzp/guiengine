@@ -44,7 +44,7 @@ class Block(object):
             self.textfont = pygame.font.match_font(self.textfont)
         self.font_object = pygame.font.Font(self.textfont, self.textsize)
         self.font_object.set_bold(self.textbold)
-        self.reset()  # 重设参数
+        self.reset(**argw)  # 重设参数
 
     def update_parm(self, **argw):  # 接收新的参数
         for item in argw:
