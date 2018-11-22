@@ -10,6 +10,7 @@ from pygame_anchors import *
 import os
 import time
 import math
+from get_clock_rz import get_clock
 
 
 class sinBlock(object):
@@ -49,7 +50,7 @@ class sinBlock(object):
                 'borderon', 'borderwidth', 'bordercolor',]
     sur = None
     blitp = (0,0)
-    clk = time.clock()
+    clk = get_clock()
 
     def __init__(self,root,**argw):
         pygame.font.init()
@@ -66,7 +67,7 @@ class sinBlock(object):
     def update_per_frame(self):
         if self.visible:
             if self.start:
-                tt = time.clock()
+                tt = get_clock()
                 if tt - self.clk > self.duration:
                     self.start = False
                     self.sur.fill(self.forecolor0)
@@ -83,7 +84,7 @@ class sinBlock(object):
         self.coef = np.array(self.forecolor1)-np.array(self.forecolor0)
         if argw.has_key('start'):   #启动
             if argw['start']:
-                self.clk = time.clock()
+                self.clk = get_clock()
 
         if self.text != '':
             txt = self.font_object.render(self.text, 1, self.textcolor)

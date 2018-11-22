@@ -7,22 +7,41 @@
 # Last Modified by:   mr tang
 # Last Modified time: 2018-11-02 22:39:28
 
-
 import os
+import platform
 import shutil
-file_path = os.path.dirname(__file__)
-from msvcrt import getch
 
-def install_package(python_path,package_name):
-    with open(python_path + r'\Lib\site-packages\%s.pth'%(package_name,),'w') as f:
-        f.write('#.pth file for the %s extensions\n'%(package_name,))
-        f.write(package_name)
+
+def install_package(package_name,python_path):
+    if platform.system().lower() == 'windows':
+        package_path = r'%s/Lib/site-packages'%(python_path,)
+    elif platform.system().lower() == 'linux':
+        package_path = r'%s/dist-packages'%(python_path)
+    else:
+        raise ImportError,'unsupported system platform %s'%(platform.system(),)
+
+    if os.path.exists(r'%s\%s.pth'%(package_path,package_name)):
+        os.remove(r'%s\%s.pth'%(package_path,package_name))
+
+    if os.path.exists(r'%s/%s'%(package_path,package_name)):
+        shutil.rmtree(r'%s/%s'%(package_path,package_name))
+
+    shutil.copy(r'./%s/%s.pth'%(package_name,package_name),r'%s'%(package_path,))
+    shutil.copytree(r'./%s'%(package_name),r'%s/%s'%(package_path,package_name))
     
-    shutil.copytree(r'.\%s'%(package_name),r'%s\Lib\site-packages\%s'%(python_path,package_name))
-    print '>>>>>>>>>>>>>>>>>>>>>>>>>>\npackage install succeed'
-    print 'any key exit'
-    getch()
+def import_test():
+    import guiengine
+    print guiengine.__doc__
 
+    print '>>>>>>>>>>>>>>>>>>>>>>>>>>\npackage installed'
+    print 'any key exit'
+    os.system('pause')
 
 if __name__ == '__main__':
-    install_package('c:\\Python27','guiengine_trzp')
+    #example for linux
+    #使用import sys
+    # sys.path查看python的路径
+    #install_package('guiengine_trzp','/usr/lib/python2.7')
+    #example for windows
+    install_package('guiengine_trzp','c:/Python27')
+    import_test()

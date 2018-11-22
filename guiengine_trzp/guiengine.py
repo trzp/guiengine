@@ -26,7 +26,7 @@ import time,math
 import os,platform
 import numpy as np
 
-from gettimestamp import get_time_stamp as sysclock
+from get_global_clock_rz import get_global_clock as sysclock
 
 if platform.system() == 'Windows':
     try:

@@ -18,7 +18,6 @@ from multiprocessing import Queue
 from multiprocessing import Event
 import multiprocessing
 import time
-from msvcrt import getch
 
 layout = {'screen':{'size':(200,200),'color':(0,0,0),'type':'normal',
                         'Fps':60,'caption':'this is an example'},

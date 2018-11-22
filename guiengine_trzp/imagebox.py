@@ -8,7 +8,6 @@
 import pygame
 from pygame_anchors import *
 import os
-import sys
 
 
 class Imagebox(object):

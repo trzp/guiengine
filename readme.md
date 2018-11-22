@@ -6,26 +6,28 @@ Author: Jingsheng Tang
 
 Email: mrtang@nudt.edu.cn
 
-##[BCIROS](http://weibo.com/ihubo),[GuiEngine](http://weibo.com/ihubo),[Phase](http://weibo.com/ihubo)
+## [BCIROS](http://weibo.com/ihubo),[GuiEngine](http://weibo.com/ihubo),[Phase](http://weibo.com/ihubo)
 
-##GuiEngine是什么?
+## GuiEngine是什么?
 一个简洁的图形刺激引擎
 
-##GuiEngine的特性
+## GuiEngine的特性
 * 为了确保图形刺激的精确性，我们使用了opengl硬件加速技术，并且运用了垂直同步(Vertical Hold)方法，使每一帧图形都能被精确渲染
 * EEG刺激实验的信号标签由GuiEngine来发射，确保标签记录的时刻是被请求的图形刺激真正被渲染时。
 * 跨平台，目前已在windows和linux系统经过测试
 
-##GuiEngine的下载与安装
+## GuiEngine的下载与安装
 * 请确保您的电脑安装有[python](https://www.python.org/)和[pygame](https://www.pygame.org/)包
-* [下载](https://github.com/trzp/guiengine)所有文件，修改setup.py中python_path，比如'c:\Python27'，并运行setup.py即完成安装
+* [下载](https://github.com/trzp/guiengine)所有文件，修改setup.py中python_path，比如'c:\Python27'或者'/usr/lib/python2.7'，并运行setup.py即完成安装
 
     ```python
     if __name__ == '__main__':
-        install_package(python_path,'guiengine_trzp')
+        install_package('guiengine_trzp',python_path)
     ```
+    
+## 依赖库：[get_global_clock_rz](https://github.com/trzp/sysclock)
 
-##GuiEngine编程
+## GuiEngine编程
 * 导入类并使用：
     ```python
     from guiengine import GuiEngine
@@ -37,8 +39,8 @@ Email: mrtang@nudt.edu.cn
     * \__init__(self,stims,Q_c2g,E_g2p,Q_g2s):实例化引擎
     * StartRun()：启动引擎
 
-##GuiEngine.\__init__参数说明
-###参数：stims:
+## GuiEngine.\__init__参数说明
+### 参数：stims:
 * python字典(未来我们将支持xml超文本标记语言描述的文件或者字符串，敬请期待)，用来描述图形界面的布局。
 * 示例：
 ```python
@@ -64,7 +66,7 @@ sti = {'screen':{'size':(600,500),'color':(0,0,0)},
             *  mBlock： 用以标识灰度以随机编码调制变化的方块
             *  ImageBox：用以加载图像的纹理
     
-###参数：Q_c2g,E_g2p,Q_g2s，用于工作进程/线程与guiengine的交互
+### 参数：Q_c2g,E_g2p,Q_g2s，用于工作进程/线程与guiengine的交互
 * 一旦GuiEngine启动(StartRun)，线程将被阻塞。因此我们需要通过另一个线程或者进程（此处称其为工作线程/进程）通过Q_c2g,E_g2p,Q_g2s与之交互。
 * Q_c2g: 这是一个能够实现线程/进程之间传递列表的类，当工作进程和GuiEngine进程具有亲缘关系时，您可以直接使用multiprocessing.Queue；
     * 当您需要通过远程或者另一个与GuiEngine进程没有亲缘关系的工作进程来与GuiEngine交互时，您可以使用命名管道或者socket来实现这个类。
@@ -86,7 +88,7 @@ sti = {'screen':{'size':(600,500),'color':(0,0,0)},
     * 工作进程通过E_g2p查询.isSet()来得知GuiEngine是否触发了用户退出事件，GuiEngine运行中可通过Esc键退出程序
 * Q_g2s: 和Q\_c2g类似。但用来向工作线程发射带时间戳的trigger。
 
-##example1
+## example1
 这是一个静态示例，这个界面仅仅显示一个text,它将不会有任何动态效果
 ```python
 from guiengine import GuiEngine
@@ -113,7 +115,7 @@ if __name__ == '__main__':
     example1()
 ```
 
-##example2
+## example2
 这个一个动态示例，我们将guimachine放在一个子进程里面运行，主进程通过Q\_c2g与之交互
 
 ```python
