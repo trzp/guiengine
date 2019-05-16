@@ -17,7 +17,7 @@ class Block(object):
     forecolor = (255, 255, 255, 255)
 
     borderon = False
-    borderwidth = 1
+    borderwidth = 2
     bordercolor = (0, 0, 0, 0)
 
     textcolor = (0, 255, 255, 0)
@@ -40,11 +40,17 @@ class Block(object):
         pygame.font.init()
         self.root = root
 
+
         if not os.path.isfile(self.textfont):
             self.textfont = pygame.font.match_font(self.textfont)
         self.font_object = pygame.font.Font(self.textfont, self.textsize)
         self.font_object.set_bold(self.textbold)
+
         self.reset(**argw)  # 重设参数
+        if not os.path.isfile(self.textfont):
+            self.textfont = pygame.font.match_font(self.textfont)
+        self.font_object = pygame.font.Font(self.textfont, self.textsize)
+        self.font_object.set_bold(self.textbold)
 
     def update_parm(self, **argw):  # 接收新的参数
         for item in argw:
