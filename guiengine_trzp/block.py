@@ -39,6 +39,7 @@ class Block(object):
     def __init__(self, root, **argw):
         pygame.font.init()
         self.root = root
+        self.transparent = False
 
 
         if not os.path.isfile(self.textfont):
@@ -69,11 +70,15 @@ class Block(object):
             p = blit_pos(txt, p0, self.textanchor)
             self.sur.blit(txt, p)
 
-        # return self.sur,self.blitp
+        if len(self.forecolor)>3 and self.forecolor[3] == 255:
+            self.transparent = True
+        else:
+            self.transparent = False
+  # return self.sur,self.blitp
 
     def show(self):  # 显示到screen
         if self.visible:
-            if self.sur != None:
+            if not self.transparent and self.sur is not None:
                 self.root.blit(self.sur, self.blitp)
             if self.borderon:
                 pygame.draw.rect(self.root, self.bordercolor, pygame.Rect(

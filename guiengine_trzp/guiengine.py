@@ -11,7 +11,10 @@
 # this basis, the stimulus trigger event is also set synchronously with the actual drawing.
 
 # Since the vertical synchronization mode is used, the graphic user interface is fullscreen.
+
+update: 2019/5/23
 '''
+
 
 import pygame
 from pygame.locals import *
@@ -28,6 +31,8 @@ import numpy as np
 
 from get_global_clock_rz import get_global_clock as sysclock
 
+# ---------------------------------------------------------------------------------------------------
+# 垂直同步设置，仅支持windows
 if platform.system() == 'Windows':
     try:
         os.putenv('SDL_VIDEODRIVER','directx')
@@ -39,6 +44,64 @@ else:
     raise IOError,'unrecognized system platform'
     
 OS = platform.system().lower()
+
+# --------------------------------------------------------------------------------------------------
+# 由于在windows下基于multiprocessing.process实现多进程类并不安全，因此将显式启动多进程函数
+# 主进程与子进程采用queue和event通信，但是提供接口类，用来封装直接对queue和event的操作
+
+layout = {'screen':{'size':(200,200),'color':(0,0,0),'type':'fullscreen',
+                        'Fps':60,'caption':'this is an example'},
+             'cue':{'class':'sinBlock','parm':{'size':(100,100),'position':(100,100),
+                    'frequency':13,'visible':True,'start':True}}}
+
+def guiengine_proc(args):
+    layout = args['layout']
+    Q_c2g = args['Q_c2g']
+    E_g2p = args['E_g2p']
+    Q_g2s = args['Q_g2s']
+    gui = GuiEngine(layout, Q_c2g, E_g2p, Q_g2s)
+    gui.StartRun()
+
+class guiCtrl():    #用于向guiengine发射信号
+    def __init__(self,layout = layout):
+        # Q_c2g:传递内容
+        #     1. 单字符串：'_q_u_i_t_' -> 结束标志
+        #     2. 列表：[stimulus setting, trigger] -> 刺激设置，trigger标志
+
+        self.Q_c2g = Queue()
+        self.E_g2p = Event()
+        self.Q_g2s = Queue()
+        self.layout = layout
+        self.args = {'layout':self.layout,'Q_c2g':self.Q_c2g,'E_g2p':self.E_g2p,'Q_g2s':self.Q_g2s}
+
+    def quit(self):
+        self.Q_c2g.put('_q_u_i_t_')
+
+    def update(self,stimulus,trigger):
+        self.Q_c2g.put([stimulus,trigger])
+
+class guiMonitor():     #用于监测gui向外发射的信号
+    def __init__(self,args):
+        self.Q_c2g = args['Q_c2g']
+        self.E_g2p = args['E_g2p']
+        self.Q_g2s = args['Q_g2s']
+
+    def wait_trigger(self):
+        return self.Q_g2s.get()
+
+    def wait_trigger_no_wait(self):
+        try:
+            r = self.Q_g2s.get_nowait()
+            return r
+        except:
+            return None
+
+    def wait_gui_quit(self):
+        self.E_g2p.wait()
+        return True
+
+    def is_gui_quit(self):
+        return self.E_g2p.is_set()
 
 class GuiEngine(threading.Thread):
     stimuli = {}
@@ -74,6 +137,7 @@ class GuiEngine(threading.Thread):
         if stims['screen']['type'].lower() == 'fullscreen':
             self.screen = pygame.display.set_mode((0,0),FULLSCREEN | DOUBLEBUF | HWSURFACE,32)
             self.vsync = True
+            print self.vsync,'vsync'
         else:
             if stims['screen'].has_key('frameless'):
                 self.screen = pygame.display.set_mode(stims['screen']['size'],NOFRAME | DOUBLEBUF,32)
@@ -128,9 +192,11 @@ class GuiEngine(threading.Thread):
             [self.stimuli[id].reset(**stimulus_arg[id]) for id in stimulus_arg.keys()] #更新刺激实例的参数
             self.ask_4_update_gui = True  #请求刷新
             self.lock.release()
+        print '>>> guiengine sub thread ended'
+    
 
     def StartRun(self):
-        print '>>>>>>> gui engine started >>>>>>>'
+        print '>>> gui engine started'
         clock = pygame.time.Clock()
         END = 0
         while True:
@@ -152,6 +218,9 @@ class GuiEngine(threading.Thread):
 
             #这一帧有刷新请求，并刚刚完成了刷新 ，这里通过queue发射带时间戳的trigger
             if self.update_in_this_frame:   #更新trigger，记录下此时的clock,因此，trigger的记录是伴随着真实的显示器刷新的
+                if self.Q_g2s.qsize()>50:   #某些场合可能并不使用到该功能，避免内存耗费过大
+                    while self.Q_g2s.qsize() > 0:
+                        self.Q_g2s.get()
                 self.Q_g2s.put([sysclock(),self.trigger_event])
                 self.update_in_this_frame = False
 
@@ -167,5 +236,13 @@ class GuiEngine(threading.Thread):
         pygame.quit()
         if END: self.E_g2p.set()  #通知phase进程，用户结束
         for ID in self.__release_ID_list:   del self.stimuli[ID]
+        self.Q_c2g.put('_q_u_i_t_')
 
-        print '>>>>>> gui engine exit >>>>>>'
+        print '>>> gui engine exit'
+
+if __name__ == '__main__':
+    Q_c2g = Queue()
+    E_g2p = Event()
+    Q_g2s = Queue()
+    config = {'layout':layout,'Q_c2g':Q_c2g,'E_g2p':E_g2p,'Q_g2s':Q_g2s}
+    guiengine_proc(config)

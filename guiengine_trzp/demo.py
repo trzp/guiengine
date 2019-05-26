@@ -19,10 +19,10 @@ from multiprocessing import Event
 import multiprocessing
 import time
 
-layout = {'screen':{'size':(200,200),'color':(0,0,0),'type':'normal',
+layout = {'screen':{'size':(200,200),'color':(0,0,0),'type':'fullscreen',
                         'Fps':60,'caption':'this is an example'},
-             'cue':{'class':'Block','parm':{'size':(100,100),'position':(100,100),
-                    'forecolor':(128,128,128),'text':'hello world','visible':True}}}
+             'cue':{'class':'sinBlock','parm':{'size':(100,100),'position':(100,100),
+                    'frequency':13,'visible':True}}}
 
 def example1():
     Q_c2g = Queue()
@@ -45,10 +45,11 @@ def example2():
 
     while True:
         if E_g2p.is_set():break
-        Q_c2g.put([{'cue':{'forecolor':(200,200,0)}},{'code':0}])
-        time.sleep(0.5)
-        Q_c2g.put([{'cue':{'forecolor':(100,100,0)}},{'code':0}])
-        time.sleep(0.5)
+        Q_c2g.put([{'cue':{'start':True}},{''}])
+        time.sleep(5)
+        Q_c2g.put([{'cue':{'start':False}},{''}])
+        time.sleep(1)
+        
 
     print 'main process exit'
 

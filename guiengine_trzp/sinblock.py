@@ -36,7 +36,7 @@ class sinBlock(object):
     
     frequency = 10
     init_phase = 0
-    duration = 5
+    duration = float('inf')
     start = False
     __fcolor = None
 
@@ -76,12 +76,16 @@ class sinBlock(object):
                 self.__fcolor = self.coef * f + self.forecolor0
                 self.sur.fill(self.__fcolor)
             else:
-                self.sur.fill(self.forecolor0)
+                # self.sur.fill(self.forecolor0)
+                pass
 
     def reset(self,**argw): #接受主控的控制
         self.update_parm(**argw)
         self.blitp = self.blitpborder = blit_pos1(self.size,self.position,self.anchor)
         self.coef = np.array(self.forecolor1)-np.array(self.forecolor0)
+        self.sur = pygame.Surface(self.size)
+        self.sur.fill(self.forecolor0)
+        
         if argw.has_key('start'):   #启动
             if argw['start']:
                 self.clk = get_clock()
