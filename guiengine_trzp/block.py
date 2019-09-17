@@ -70,7 +70,7 @@ class Block(object):
             p = blit_pos(txt, p0, self.textanchor)
             self.sur.blit(txt, p)
 
-        if len(self.forecolor)>3 and self.forecolor[3] == 255:
+        if len(self.forecolor)>3 and self.forecolor[3] == 0:
             self.transparent = True
         else:
             self.transparent = False

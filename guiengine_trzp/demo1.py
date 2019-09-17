@@ -19,21 +19,23 @@ def main():
     layout = {'screen': {'size': (200, 200), 'color': (0, 0, 0), 'type': 'normal',
                          'Fps': 60, 'caption': 'this is an example'},
               'cue': {'class': 'sinBlock', 'parm': {'size': (100, 100), 'position': (100, 100),
-                                                    'frequency': 13, 'visible': True,'start':False}}}
+                                                    'frequency': 8.3, 'visible': True,'start':False}}}
     gui_ctrl = guiCtrl(layout)
     gui_monitor = guiMonitor(gui_ctrl.args)
     sub_gui_pro = multiprocessing.Process(target=guiengine_proc,args=(gui_ctrl.args,))
     sub_gui_pro.start()
 
-    time.sleep(3)
-    while True:
-        if gui_monitor.is_gui_quit():   break
-        gui_ctrl.update({'cue':{'start':True}},{''})
-        print 'start'
-        time.sleep(3)
-        gui_ctrl.update({'cue': {'start': False}},{''})
-        print 'stop'
-        time.sleep(1)
+    # time.sleep(3)
+    # while True:
+        # if gui_monitor.is_gui_quit():   break
+        # gui_ctrl.update({'cue':{'start':True}},{''})
+        # print 'start'
+        # time.sleep(3)
+        # gui_ctrl.update({'cue': {'start': False}},{''})
+        # print 'stop'
+        # time.sleep(1)
+    # raw_input()
+    gui_ctrl.update({'cue':{'start':True}},{''})
 
     print 'main process quit'
 

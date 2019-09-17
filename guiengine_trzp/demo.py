@@ -43,12 +43,12 @@ def example2():
     process = multiprocessing.Process(target=proc,args=(layout,Q_c2g,E_g2p,Q_g2s))
     process.start()
 
-    while True:
-        if E_g2p.is_set():break
-        Q_c2g.put([{'cue':{'start':True}},{''}])
-        time.sleep(5)
-        Q_c2g.put([{'cue':{'start':False}},{''}])
-        time.sleep(1)
+    # while True:
+        # if E_g2p.is_set():break
+        # Q_c2g.put([{'cue':{'start':True}},{''}])
+        # time.sleep(5)
+        # Q_c2g.put([{'cue':{'start':False}},{''}])
+        # time.sleep(1)
         
 
     print 'main process exit'
